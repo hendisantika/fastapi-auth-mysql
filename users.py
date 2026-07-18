@@ -5,7 +5,10 @@ from sqlalchemy.orm import Session
 import models
 import schemas
 from database import get_db
+from logging_config import get_logger
 from security import require_admin
+
+logger = get_logger("app.users")
 
 router = APIRouter(
     prefix="/users",
@@ -60,9 +63,13 @@ def update_user_role(
 ):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if user is None:
+        logger.warning("Role update failed, user not found: id=%s", user_id)
         raise HTTPException(status_code=404, detail="User not found")
 
     if user.id == admin.id and payload.role != "admin":
+        logger.warning(
+            "Admin %s attempted to revoke their own admin role", admin.username
+        )
         raise HTTPException(
             status_code=400,
             detail="Admins cannot revoke their own admin role",
@@ -71,6 +78,12 @@ def update_user_role(
     user.role = payload.role
     db.commit()
     db.refresh(user)
+    logger.info(
+        "User role updated: id=%s role=%s by=%s",
+        user.id,
+        user.role,
+        admin.username,
+    )
     return user
 
 
@@ -82,9 +95,11 @@ def delete_user(
 ):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if user is None:
+        logger.warning("Delete failed, user not found: id=%s", user_id)
         raise HTTPException(status_code=404, detail="User not found")
 
     if user.id == admin.id:
+        logger.warning("Admin %s attempted to delete their own account", admin.username)
         raise HTTPException(
             status_code=400,
             detail="Admins cannot delete their own account",
@@ -92,4 +107,5 @@ def delete_user(
 
     db.delete(user)
     db.commit()
+    logger.info("User deleted: id=%s username=%s by=%s", user_id, user.username, admin.username)
     return {"message": "User deleted successfully"}

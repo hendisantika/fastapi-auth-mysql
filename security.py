@@ -10,6 +10,9 @@ from sqlalchemy.orm import Session
 
 import models
 from database import get_db
+from logging_config import get_logger
+
+logger = get_logger("app.security")
 
 load_dotenv()
 
@@ -50,12 +53,15 @@ def get_current_user(
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
         if username is None:
+            logger.warning("Token rejected: missing 'sub' claim")
             raise credentials_exception
     except JWTError:
+        logger.warning("Token rejected: invalid or expired JWT")
         raise credentials_exception
 
     user = db.query(models.User).filter(models.User.username == username).first()
     if user is None:
+        logger.warning("Token rejected: user '%s' not found", username)
         raise credentials_exception
     return user
 
@@ -64,6 +70,11 @@ def require_admin(
     current_user: models.User = Depends(get_current_user),
 ) -> models.User:
     if current_user.role != "admin":
+        logger.warning(
+            "Admin access denied for user=%s (role=%s)",
+            current_user.username,
+            current_user.role,
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin privileges required",

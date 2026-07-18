@@ -4,6 +4,9 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from database import get_db
+from logging_config import get_logger
+
+logger = get_logger("app.actuator")
 
 router = APIRouter(prefix="/actuator", tags=["actuator"])
 
@@ -31,6 +34,7 @@ def health(db: Session = Depends(get_db)):
         db.execute(text("SELECT 1"))
         db_status = "UP"
     except Exception:
+        logger.error("Health check failed: database is unreachable", exc_info=True)
         db_status = "DOWN"
 
     status = "UP" if db_status == "UP" else "DOWN"

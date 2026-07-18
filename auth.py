@@ -5,12 +5,15 @@ from sqlalchemy.orm import Session
 import models
 import schemas
 from database import get_db
+from logging_config import get_logger
 from security import (
     create_access_token,
     get_current_user,
     hash_password,
     verify_password,
 )
+
+logger = get_logger("app.auth")
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -30,6 +33,11 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
         .first()
     )
     if existing:
+        logger.warning(
+            "Registration rejected: username=%s or email=%s already exists",
+            user.username,
+            user.email,
+        )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username or email already registered",
@@ -43,6 +51,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+    logger.info("User registered: id=%s username=%s", db_user.id, db_user.username)
     return db_user
 
 
@@ -57,6 +66,7 @@ def login(
         .first()
     )
     if not user or not verify_password(form_data.password, user.hashed_password):
+        logger.warning("Failed login attempt for username=%s", form_data.username)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
@@ -64,6 +74,7 @@ def login(
         )
 
     access_token = create_access_token(data={"sub": user.username})
+    logger.info("User logged in: username=%s", user.username)
     return schemas.Token(access_token=access_token)
 
 

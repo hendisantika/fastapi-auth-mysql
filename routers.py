@@ -5,7 +5,10 @@ from sqlalchemy.orm import Session
 import models
 import schemas
 from database import get_db
+from logging_config import get_logger
 from security import get_current_user
+
+logger = get_logger("app.items")
 
 SORTABLE_FIELDS = {"id", "name", "price", "created_at", "updated_at"}
 
@@ -30,6 +33,12 @@ def create_item(
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
+    logger.info(
+        "Item created: id=%s name=%s by=%s",
+        db_item.id,
+        db_item.name,
+        current_user.username,
+    )
     return db_item
 
 
@@ -79,6 +88,7 @@ def get_items(
 def get_item(item_id: int, db: Session = Depends(get_db)):
     item = db.query(models.Item).filter(models.Item.id == item_id).first()
     if item is None:
+        logger.warning("Item not found: id=%s", item_id)
         raise HTTPException(status_code=404, detail="Item not found")
     return item
 
@@ -92,6 +102,7 @@ def update_item(
 ):
     item = db.query(models.Item).filter(models.Item.id == item_id).first()
     if item is None:
+        logger.warning("Update failed, item not found: id=%s", item_id)
         raise HTTPException(status_code=404, detail="Item not found")
 
     item.name = updated_item.name
@@ -99,6 +110,7 @@ def update_item(
     item.updated_by = current_user.username
     db.commit()
     db.refresh(item)
+    logger.info("Item updated: id=%s by=%s", item_id, current_user.username)
     return item
 
 
@@ -106,8 +118,10 @@ def update_item(
 def delete_item(item_id: int, db: Session = Depends(get_db)):
     item = db.query(models.Item).filter(models.Item.id == item_id).first()
     if item is None:
+        logger.warning("Delete failed, item not found: id=%s", item_id)
         raise HTTPException(status_code=404, detail="Item not found")
 
     db.delete(item)
     db.commit()
+    logger.info("Item deleted: id=%s", item_id)
     return {"message": "Item deleted successfully"}
