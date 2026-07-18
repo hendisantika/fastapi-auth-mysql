@@ -1,0 +1,51 @@
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import asc, desc
+from sqlalchemy.orm import Session
+
+import models
+import schemas
+from database import get_db
+from security import get_current_user
+
+router = APIRouter(
+    prefix="/users",
+    tags=["users"],
+    dependencies=[Depends(get_current_user)],
+)
+
+SORTABLE_FIELDS = {"id", "username", "email", "created_at"}
+
+
+@router.get("/", response_model=schemas.PaginatedUsers)
+def get_users(
+    db: Session = Depends(get_db),
+    skip: int = Query(0, ge=0, description="Number of records to skip"),
+    limit: int = Query(10, ge=1, le=100, description="Max records to return"),
+    username: str | None = Query(None, description="Filter by username (partial)"),
+    email: str | None = Query(None, description="Filter by email (partial)"),
+    is_active: bool | None = Query(None, description="Filter by active status"),
+    sort_by: str = Query("id", description="Field to sort by"),
+    order: str = Query("asc", pattern="^(asc|desc)$", description="Sort direction"),
+):
+    if sort_by not in SORTABLE_FIELDS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid sort_by. Allowed: {sorted(SORTABLE_FIELDS)}",
+        )
+
+    query = db.query(models.User)
+
+    if username:
+        query = query.filter(models.User.username.ilike(f"%{username}%"))
+    if email:
+        query = query.filter(models.User.email.ilike(f"%{email}%"))
+    if is_active is not None:
+        query = query.filter(models.User.is_active == is_active)
+
+    total = query.count()
+
+    sort_column = getattr(models.User, sort_by)
+    query = query.order_by(desc(sort_column) if order == "desc" else asc(sort_column))
+
+    users = query.offset(skip).limit(limit).all()
+    return schemas.PaginatedUsers(total=total, skip=skip, limit=limit, users=users)

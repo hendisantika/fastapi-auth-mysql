@@ -105,6 +105,7 @@ The API is available at `http://127.0.0.1:8000`.
 | POST   | `/auth/register`   | Register a new user     |
 | POST   | `/auth/login`      | Obtain a JWT token      |
 | GET    | `/auth/me`         | Current user (JWT auth) |
+| GET    | `/users/`          | List users (paginated) 🔒 |
 | POST   | `/items/`          | Create an item 🔒       |
 | GET    | `/items/`          | List items (paginated) 🔒 |
 | GET    | `/items/{item_id}` | Get an item by ID 🔒    |

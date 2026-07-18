@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from auth import router as auth_router
 from routers import router as items_router
+from users import router as users_router
 
 # Database schema is managed by Alembic migrations (see `migrations/`).
 # Run `alembic upgrade head` to create/update tables.
@@ -18,6 +19,7 @@ app = FastAPI(
 )
 
 app.include_router(auth_router)
+app.include_router(users_router)
 app.include_router(items_router)
 
 
