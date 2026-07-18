@@ -163,7 +163,7 @@ nginx over plain HTTP (port 80). nginx reverse-proxies to the container on
 
 ### Cloudflare setup (dashboard, one-time)
 
-1. **DNS** — add an `A` record: `fastapi` → `157.245.53.112`, **Proxied**
+1. **DNS** — add an `A` record: `fastapi` → `<dev-server-ip>`, **Proxied**
    (orange cloud).
 2. **SSL/TLS mode** — set to **Flexible**.
 
@@ -176,6 +176,7 @@ nginx over plain HTTP (port 80). nginx reverse-proxies to the container on
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - ReDoc: `http://127.0.0.1:8000/redoc`
 - OpenAPI spec: `http://127.0.0.1:8000/openapi.json`
+- Postman collection: [`postman/`](postman/) (collection + Dev environment)
 
 ## Endpoints
 
