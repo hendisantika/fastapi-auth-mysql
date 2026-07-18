@@ -5,3 +5,8 @@ def create_item(item: Item):
         "message": "Item created successfully",
         "data": item
     }
+
+
+@app.get("/items/")
+def get_items():
+    return items
