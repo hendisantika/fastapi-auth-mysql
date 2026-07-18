@@ -131,8 +131,9 @@ The `CI/CD` workflow runs three chained jobs on every push to `main`:
 `deploy` job SSHes into the dev server, pulls the image tagged with the run
 number, and restarts the container. Runtime configuration is injected from
 repository secrets as environment variables (no `.env` file needed on the
-server). The container reaches a MySQL instance running on the host via
-`host.docker.internal`. Pull requests run only the `build` job.
+server). The container is published on host port `8888` (→ container `8000`) and
+reaches a MySQL instance running on the host via `host.docker.internal`. Pull
+requests run only the `build` job.
 
 Required repository secrets:
 

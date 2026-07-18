@@ -132,6 +132,6 @@ jobs:
               -e SECRET_KEY="$SECRET_KEY" \
               -e ALGORITHM="$ALGORITHM" \
               -e ACCESS_TOKEN_EXPIRE_MINUTES="$ACCESS_TOKEN_EXPIRE_MINUTES" \
-              -p 8000:8000 \
+              -p 8888:8000 \
               "$IMAGE_NAME:$IMAGE_TAG"
             docker image prune -f
