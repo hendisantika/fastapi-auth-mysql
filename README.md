@@ -124,6 +124,21 @@ docker run -p 8000:8000 \
 > Publishing requires two repository secrets: `DOCKERHUB_USERNAME` and
 > `DOCKERHUB_TOKEN` (a Docker Hub access token).
 
+### Dev deployment
+
+After a successful image publish, the `Deploy to Dev` workflow SSHes into the
+dev server, pulls `:latest`, and restarts the container. It reads runtime
+configuration from `/opt/fastapi-auth-mysql/.env` on the server.
+
+Required repository secrets:
+
+| Secret                | Description                                  |
+|-----------------------|----------------------------------------------|
+| `SSH_HOST_DEV`        | Dev server host/IP                           |
+| `SSH_PORT_DEV`        | SSH port (e.g. `22`)                         |
+| `SSH_USERNAME_DEV`    | SSH user (e.g. `deployer`)                   |
+| `SSH_PRIVATE_KEY_DEV` | Private key authorized on the dev server     |
+
 ## API Documentation
 
 - Swagger UI: `http://127.0.0.1:8000/docs`
