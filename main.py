@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from actuator import router as actuator_router
 from auth import router as auth_router
 from routers import router as items_router
 from users import router as users_router
@@ -18,6 +19,7 @@ app = FastAPI(
     },
 )
 
+app.include_router(actuator_router)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(items_router)

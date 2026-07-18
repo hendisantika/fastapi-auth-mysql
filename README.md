@@ -131,9 +131,10 @@ The `CI/CD` workflow runs three chained jobs on every push to `main`:
 `deploy` job SSHes into the dev server, pulls the image tagged with the run
 number, and restarts the container. Runtime configuration is injected from
 repository secrets as environment variables (no `.env` file needed on the
-server). The container is published on host port `8888` (→ container `8000`) and
-reaches a MySQL instance running on the host via `host.docker.internal`. Pull
-requests run only the `build` job.
+server). Before starting the app, the deploy runs `alembic upgrade head` against
+the dev MySQL in a throwaway container. The app container is published on host
+port `8888` (→ container `8000`) and reaches a MySQL instance running on the host
+via `host.docker.internal`. Pull requests run only the `build` job.
 
 Required repository secrets:
 
@@ -159,6 +160,9 @@ Required repository secrets:
 | Method | Path               | Description             |
 |--------|--------------------|-------------------------|
 | GET    | `/`                | Health/welcome          |
+| GET    | `/actuator`        | Actuator endpoint index |
+| GET    | `/actuator/health` | DB health probe (`UP`/`DOWN`) |
+| GET    | `/actuator/info`   | App name/version/info   |
 | POST   | `/auth/register`   | Register a new user     |
 | POST   | `/auth/login`      | Obtain a JWT token      |
 | GET    | `/auth/me`         | Current user (JWT auth) |
