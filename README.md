@@ -1,6 +1,6 @@
 # fastapi-auth-mysql
 
-[![CI](https://github.com/hendisantika/fastapi-auth-mysql/actions/workflows/ci.yml/badge.svg)](https://github.com/hendisantika/fastapi-auth-mysql/actions/workflows/ci.yml)
+[![CI/CD](https://github.com/hendisantika/fastapi-auth-mysql/actions/workflows/deploy_to_dev.yml/badge.svg)](https://github.com/hendisantika/fastapi-auth-mysql/actions/workflows/deploy_to_dev.yml)
 
 A simple FastAPI CRUD API backed by MySQL using SQLAlchemy.
 
@@ -126,9 +126,11 @@ docker run -p 8000:8000 \
 
 ### Dev deployment
 
-After a successful image publish, the `Deploy to Dev` workflow SSHes into the
-dev server, pulls `:latest`, and restarts the container. It reads runtime
-configuration from `/opt/fastapi-auth-mysql/.env` on the server.
+The `CI/CD` workflow runs three chained jobs on every push to `main`:
+`build` (tests + migrations) → `docker` (build & push image) → `deploy`. The
+`deploy` job SSHes into the dev server, pulls `:latest`, and restarts the
+container, reading runtime configuration from `/opt/fastapi-auth-mysql/.env` on
+the server. Pull requests run only the `build` job.
 
 Required repository secrets:
 
