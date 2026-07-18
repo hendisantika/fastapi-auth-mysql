@@ -1,0 +1,56 @@
+name: Nginx Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  nginx:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Upload nginx config to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST_DEV }}
+          port: ${{ secrets.SSH_PORT_DEV }}
+          username: ${{ secrets.SSH_USERNAME_DEV }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
+          source: nginx/fastapi.gtilabsid.conf
+          target: /tmp
+          overwrite: true
+
+      - name: Install and reload nginx
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST_DEV }}
+          port: ${{ secrets.SSH_PORT_DEV }}
+          username: ${{ secrets.SSH_USERNAME_DEV }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
+          script: |
+            set -e
+
+            # Install nginx if it is not present
+            if ! command -v nginx >/dev/null 2>&1; then
+              sudo apt-get update
+              sudo apt-get install -y nginx
+            fi
+
+            # Origin certificate for Cloudflare "Full" mode.
+            # Generates a self-signed cert once; replace with a Cloudflare
+            # Origin Certificate for "Full (strict)".
+            sudo mkdir -p /etc/nginx/ssl
+            if [ ! -f /etc/nginx/ssl/fastapi.gtilabs.id.pem ]; then
+              sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+                -keyout /etc/nginx/ssl/fastapi.gtilabs.id.key \
+                -out /etc/nginx/ssl/fastapi.gtilabs.id.pem \
+                -subj "/CN=fastapi.gtilabs.id"
+            fi
+
+            # Install the site config and reload
+            sudo mv /tmp/nginx/fastapi.gtilabsid.conf /etc/nginx/conf.d/fastapi.gtilabsid.conf
+            sudo nginx -t
+            sudo systemctl reload nginx
+            echo "nginx reloaded for fastapi.gtilabs.id"

@@ -149,6 +149,27 @@ Required repository secrets:
 | `DATABASE_URL`        | e.g. `mysql+pymysql://user:pass@host.docker.internal:3306/fastapi_auth` |
 | `SECRET_KEY`          | JWT signing secret (`openssl rand -hex 32`)        |
 
+## Reverse Proxy (nginx + Cloudflare)
+
+The app is served at **https://fastapi.gtilabs.id** through Cloudflare. Cloudflare
+terminates public TLS and forwards to the origin nginx, which serves HTTPS and
+reverse-proxies to the container on `127.0.0.1:8888`.
+
+- Config: [`nginx/fastapi.gtilabsid.conf`](nginx/fastapi.gtilabsid.conf)
+- Provisioning: run the **Nginx Deploy** workflow
+  (`gh workflow run nginx-deploy.yml`) — it uploads the config, generates an
+  origin certificate, installs, and reloads nginx on the dev server.
+
+### Cloudflare setup (dashboard, one-time)
+
+1. **DNS** — add an `A` record: `fastapi` → `157.245.53.112`, **Proxied**
+   (orange cloud).
+2. **SSL/TLS mode** — set to **Full**. The provisioning workflow installs a
+   self-signed origin certificate, which Cloudflare accepts in Full mode.
+3. *(Optional, recommended)* For **Full (strict)**, generate a Cloudflare
+   **Origin Certificate**, place it on the server at
+   `/etc/nginx/ssl/fastapi.gtilabs.id.pem` / `.key`, and reload nginx.
+
 ## API Documentation
 
 - Swagger UI: `http://127.0.0.1:8000/docs`
