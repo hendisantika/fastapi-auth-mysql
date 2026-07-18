@@ -53,7 +53,26 @@ A simple FastAPI CRUD API backed by MySQL using SQLAlchemy.
    DATABASE_URL=mysql+pymysql://root:password@localhost:3306/fastapi_auth
    ```
 
-   Tables are created automatically on application startup.
+5. Run database migrations to create the tables:
+
+   ```bash
+   alembic upgrade head
+   ```
+
+## Database Migrations
+
+Schema changes are managed with [Alembic](https://alembic.sqlalchemy.org/).
+
+```bash
+# Apply all pending migrations
+alembic upgrade head
+
+# Autogenerate a new migration after changing the models
+alembic revision --autogenerate -m "describe your change"
+
+# Roll back the most recent migration
+alembic downgrade -1
+```
 
 ## Running
 

@@ -1,10 +1,9 @@
 from fastapi import FastAPI
 
-import models
-from database import Base, engine
 from routers import router as items_router
 
-Base.metadata.create_all(bind=engine)
+# Database schema is managed by Alembic migrations (see `migrations/`).
+# Run `alembic upgrade head` to create/update tables.
 
 app = FastAPI(
     title="FastAPI Auth MySQL",
@@ -12,7 +11,7 @@ app = FastAPI(
     version="1.0.0",
     contact={
         "name": "Hendi Santika",
-        "email": "hendi.santika@mhdc.co.id",
+        "email": "hendisantika@yahoo.co.id",
         "url": "https://github.com/hendisantika",
     },
 )
