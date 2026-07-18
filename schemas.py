@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -54,6 +55,10 @@ class UserResponse(UserBase):
 
     class Config:
         from_attributes = True
+
+
+class UserRoleUpdate(BaseModel):
+    role: Literal["user", "admin"]
 
 
 class Token(BaseModel):

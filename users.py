@@ -49,3 +49,26 @@ def get_users(
 
     users = query.offset(skip).limit(limit).all()
     return schemas.PaginatedUsers(total=total, skip=skip, limit=limit, users=users)
+
+
+@router.patch("/{user_id}/role", response_model=schemas.UserResponse)
+def update_user_role(
+    user_id: int,
+    payload: schemas.UserRoleUpdate,
+    db: Session = Depends(get_db),
+    admin: models.User = Depends(require_admin),
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user.id == admin.id and payload.role != "admin":
+        raise HTTPException(
+            status_code=400,
+            detail="Admins cannot revoke their own admin role",
+        )
+
+    user.role = payload.role
+    db.commit()
+    db.refresh(user)
+    return user
