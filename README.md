@@ -63,12 +63,21 @@ A simple FastAPI CRUD API backed by MySQL using SQLAlchemy.
 
 Schema changes are managed with [Alembic](https://alembic.sqlalchemy.org/).
 
+Migration files follow a Flyway-style naming convention:
+
+```
+V<version>_DDMMYYYY_HHMM__<description>.py
+```
+
+For example: `V1_18072026_0900__create_items_table.py`.
+
 ```bash
 # Apply all pending migrations
 alembic upgrade head
 
 # Autogenerate a new migration after changing the models
-alembic revision --autogenerate -m "describe your change"
+# Pass an explicit, incrementing version via --rev-id
+alembic revision --autogenerate --rev-id 2 -m "add users table"
 
 # Roll back the most recent migration
 alembic downgrade -1
