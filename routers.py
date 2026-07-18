@@ -34,3 +34,18 @@ def update_item(item_id: int, updated_item: Item):
             }
 
     return {"error": "Item not found"}
+
+
+@app.delete("/items/{item_id}")
+def delete_item(item_id: int):
+    for index, item in enumerate(items):
+
+        if item.id == item_id:
+            deleted_item = items.pop(index)
+
+            return {
+                "message": "Item deleted successfully",
+                "data": deleted_item
+            }
+
+    return {"error": "Item not found"}
