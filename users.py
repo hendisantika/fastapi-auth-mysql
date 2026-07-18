@@ -5,12 +5,12 @@ from sqlalchemy.orm import Session
 import models
 import schemas
 from database import get_db
-from security import get_current_user
+from security import require_admin
 
 router = APIRouter(
     prefix="/users",
     tags=["users"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(require_admin)],
 )
 
 SORTABLE_FIELDS = {"id", "username", "email", "created_at"}

@@ -105,7 +105,7 @@ The API is available at `http://127.0.0.1:8000`.
 | POST   | `/auth/register`   | Register a new user     |
 | POST   | `/auth/login`      | Obtain a JWT token      |
 | GET    | `/auth/me`         | Current user (JWT auth) |
-| GET    | `/users/`          | List users (paginated) 🔒 |
+| GET    | `/users/`          | List users (paginated, admin only) 🔒👑 |
 | POST   | `/items/`          | Create an item 🔒       |
 | GET    | `/items/`          | List items (paginated) 🔒 |
 | GET    | `/items/{item_id}` | Get an item by ID 🔒    |
@@ -143,6 +143,16 @@ The API uses OAuth2 password flow with JWT bearer tokens.
    `access_token`.
 3. Send the token on protected endpoints via the
    `Authorization: Bearer <token>` header (or the **Authorize** button in Swagger).
+
+### Roles
+
+Each user has a `role` (`user` by default). Admin-only endpoints (e.g. listing
+all users) require `role = "admin"`. New registrations are always created as
+`user`; promote an account by updating its `role` to `admin` in the database:
+
+```sql
+UPDATE users SET role = 'admin' WHERE username = 'your_username';
+```
 
 ## Author
 
