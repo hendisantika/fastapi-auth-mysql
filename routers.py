@@ -4,8 +4,13 @@ from sqlalchemy.orm import Session
 import models
 import schemas
 from database import get_db
+from security import get_current_user
 
-router = APIRouter(prefix="/items", tags=["items"])
+router = APIRouter(
+    prefix="/items",
+    tags=["items"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 @router.post("/", response_model=schemas.ItemResponse)

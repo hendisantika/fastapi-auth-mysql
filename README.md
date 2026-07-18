@@ -105,11 +105,13 @@ The API is available at `http://127.0.0.1:8000`.
 | POST   | `/auth/register`   | Register a new user     |
 | POST   | `/auth/login`      | Obtain a JWT token      |
 | GET    | `/auth/me`         | Current user (JWT auth) |
-| POST   | `/items/`          | Create an item          |
-| GET    | `/items/`          | List all items          |
-| GET    | `/items/{item_id}` | Get an item by ID       |
-| PUT    | `/items/{item_id}` | Update an item          |
-| DELETE | `/items/{item_id}` | Delete an item          |
+| POST   | `/items/`          | Create an item 🔒       |
+| GET    | `/items/`          | List all items 🔒       |
+| GET    | `/items/{item_id}` | Get an item by ID 🔒    |
+| PUT    | `/items/{item_id}` | Update an item 🔒       |
+| DELETE | `/items/{item_id}` | Delete an item 🔒       |
+
+> 🔒 Requires a valid JWT bearer token (see [Authentication](#authentication)).
 
 ## Authentication
 
