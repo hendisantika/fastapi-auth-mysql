@@ -4,7 +4,7 @@ sqlalchemy==2.0.51
 pymysql==1.2.0
 python-dotenv==1.2.2
 alembic==1.18.5
-passlib[bcrypt]==1.7.4
+bcrypt==4.2.1
 python-jose[cryptography]==3.5.0
 python-multipart==0.0.32
 email-validator==2.3.0
