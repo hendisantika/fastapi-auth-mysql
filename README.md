@@ -99,14 +99,27 @@ The API is available at `http://127.0.0.1:8000`.
 
 ## Endpoints
 
-| Method | Path               | Description        |
-|--------|--------------------|--------------------|
-| GET    | `/`                | Health/welcome     |
-| POST   | `/items/`          | Create an item     |
-| GET    | `/items/`          | List all items     |
-| GET    | `/items/{item_id}` | Get an item by ID  |
-| PUT    | `/items/{item_id}` | Update an item     |
-| DELETE | `/items/{item_id}` | Delete an item     |
+| Method | Path               | Description             |
+|--------|--------------------|-------------------------|
+| GET    | `/`                | Health/welcome          |
+| POST   | `/auth/register`   | Register a new user     |
+| POST   | `/auth/login`      | Obtain a JWT token      |
+| GET    | `/auth/me`         | Current user (JWT auth) |
+| POST   | `/items/`          | Create an item          |
+| GET    | `/items/`          | List all items          |
+| GET    | `/items/{item_id}` | Get an item by ID       |
+| PUT    | `/items/{item_id}` | Update an item          |
+| DELETE | `/items/{item_id}` | Delete an item          |
+
+## Authentication
+
+The API uses OAuth2 password flow with JWT bearer tokens.
+
+1. `POST /auth/register` with a JSON body: `{ "username", "email", "password" }`.
+2. `POST /auth/login` with form fields `username` and `password` to receive an
+   `access_token`.
+3. Send the token on protected endpoints via the
+   `Authorization: Bearer <token>` header (or the **Authorize** button in Swagger).
 
 ## Author
 

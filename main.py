@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from auth import router as auth_router
 from routers import router as items_router
 
 # Database schema is managed by Alembic migrations (see `migrations/`).
@@ -16,6 +17,7 @@ app = FastAPI(
     },
 )
 
+app.include_router(auth_router)
 app.include_router(items_router)
 
 
