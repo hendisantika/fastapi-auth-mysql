@@ -128,18 +128,24 @@ docker run -p 8000:8000 \
 
 The `CI/CD` workflow runs three chained jobs on every push to `main`:
 `build` (tests + migrations) → `docker` (build & push image) → `deploy`. The
-`deploy` job SSHes into the dev server, pulls `:latest`, and restarts the
-container, reading runtime configuration from `/opt/fastapi-auth-mysql/.env` on
-the server. Pull requests run only the `build` job.
+`deploy` job SSHes into the dev server, pulls the image tagged with the run
+number, and restarts the container. Runtime configuration is injected from
+repository secrets as environment variables (no `.env` file needed on the
+server). The container reaches a MySQL instance running on the host via
+`host.docker.internal`. Pull requests run only the `build` job.
 
 Required repository secrets:
 
-| Secret                | Description                                  |
-|-----------------------|----------------------------------------------|
-| `SSH_HOST_DEV`        | Dev server host/IP                           |
-| `SSH_PORT_DEV`        | SSH port (e.g. `22`)                         |
-| `SSH_USERNAME_DEV`    | SSH user (e.g. `deployer`)                   |
-| `SSH_PRIVATE_KEY_DEV` | Private key authorized on the dev server     |
+| Secret                | Description                                        |
+|-----------------------|----------------------------------------------------|
+| `DOCKERHUB_USERNAME`  | Docker Hub username                                |
+| `DOCKERHUB_TOKEN`     | Docker Hub access token                            |
+| `SSH_HOST_DEV`        | Dev server host/IP                                 |
+| `SSH_PORT_DEV`        | SSH port (e.g. `22`)                               |
+| `SSH_USERNAME_DEV`    | SSH user (e.g. `deployer`)                         |
+| `SSH_PRIVATE_KEY_DEV` | Private key authorized on the dev server           |
+| `DATABASE_URL`        | e.g. `mysql+pymysql://user:pass@host.docker.internal:3306/fastapi_auth` |
+| `SECRET_KEY`          | JWT signing secret (`openssl rand -hex 32`)        |
 
 ## API Documentation
 
