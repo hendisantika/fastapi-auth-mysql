@@ -107,6 +107,7 @@ The API is available at `http://127.0.0.1:8000`.
 | GET    | `/auth/me`         | Current user (JWT auth) |
 | GET    | `/users/`          | List users (paginated, admin only) 🔒👑 |
 | PATCH  | `/users/{user_id}/role` | Update a user's role (admin only) 🔒👑 |
+| DELETE | `/users/{user_id}` | Delete a user (admin only) 🔒👑 |
 | POST   | `/items/`          | Create an item 🔒       |
 | GET    | `/items/`          | List items (paginated) 🔒 |
 | GET    | `/items/{item_id}` | Get an item by ID 🔒    |
@@ -239,6 +240,9 @@ curl -X PATCH http://127.0.0.1:8000/users/2/role \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"role": "admin"}'
+
+curl -X DELETE http://127.0.0.1:8000/users/2 \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
 ## Author

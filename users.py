@@ -72,3 +72,24 @@ def update_user_role(
     db.commit()
     db.refresh(user)
     return user
+
+
+@router.delete("/{user_id}")
+def delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin: models.User = Depends(require_admin),
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user.id == admin.id:
+        raise HTTPException(
+            status_code=400,
+            detail="Admins cannot delete their own account",
+        )
+
+    db.delete(user)
+    db.commit()
+    return {"message": "User deleted successfully"}
