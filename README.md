@@ -93,6 +93,37 @@ uvicorn main:app --reload
 
 The API is available at `http://127.0.0.1:8000`.
 
+## Docker
+
+### Run locally with Docker Compose
+
+Brings up MySQL and the API (runs migrations automatically on startup):
+
+```bash
+docker compose up --build
+```
+
+The API is then available at `http://127.0.0.1:8000`.
+
+### Pull the published image
+
+Images are published to Docker Hub as
+[`hendisantika/fastapi-auth-mysql`](https://hub.docker.com/r/hendisantika/fastapi-auth-mysql).
+Each push to `main` publishes a tag equal to the GitHub Actions run number, plus
+`latest`:
+
+```bash
+docker pull hendisantika/fastapi-auth-mysql:latest
+
+docker run -p 8000:8000 \
+  -e DATABASE_URL="mysql+pymysql://root:password@host.docker.internal:3306/fastapi_auth" \
+  -e SECRET_KEY="change-me-in-production" \
+  hendisantika/fastapi-auth-mysql:latest
+```
+
+> Publishing requires two repository secrets: `DOCKERHUB_USERNAME` and
+> `DOCKERHUB_TOKEN` (a Docker Hub access token).
+
 ## API Documentation
 
 - Swagger UI: `http://127.0.0.1:8000/docs`
