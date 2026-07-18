@@ -31,13 +31,6 @@ class PaginatedItems(BaseModel):
     items: list[ItemResponse]
 
 
-class PaginatedUsers(BaseModel):
-    total: int
-    skip: int
-    limit: int
-    users: list[UserResponse]
-
-
 class UserBase(BaseModel):
     username: str = Field(min_length=3, max_length=50)
     email: EmailStr
@@ -55,6 +48,13 @@ class UserResponse(UserBase):
 
     class Config:
         from_attributes = True
+
+
+class PaginatedUsers(BaseModel):
+    total: int
+    skip: int
+    limit: int
+    users: list[UserResponse]
 
 
 class UserRoleUpdate(BaseModel):
