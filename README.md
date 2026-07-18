@@ -1,5 +1,7 @@
 # fastapi-auth-mysql
 
+[![CI](https://github.com/hendisantika/fastapi-auth-mysql/actions/workflows/ci.yml/badge.svg)](https://github.com/hendisantika/fastapi-auth-mysql/actions/workflows/ci.yml)
+
 A simple FastAPI CRUD API backed by MySQL using SQLAlchemy.
 
 ## Features
