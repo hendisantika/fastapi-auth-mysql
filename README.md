@@ -155,6 +155,92 @@ all users) require `role = "admin"`. New registrations are always created as
 UPDATE users SET role = 'admin' WHERE username = 'your_username';
 ```
 
+## curl Examples
+
+Assuming the API runs at `http://127.0.0.1:8000`.
+
+### Register a user
+
+```bash
+curl -X POST http://127.0.0.1:8000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username": "hendi", "email": "hendi@example.com", "password": "secret123"}'
+```
+
+### Login and capture the token
+
+```bash
+# Login uses form-encoded fields (OAuth2 password flow)
+curl -X POST http://127.0.0.1:8000/auth/login \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=hendi&password=secret123"
+
+# Save the token directly into a shell variable
+TOKEN=$(curl -s -X POST http://127.0.0.1:8000/auth/login \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=hendi&password=secret123" | jq -r .access_token)
+```
+
+### Get the current user
+
+```bash
+curl http://127.0.0.1:8000/auth/me \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Create an item
+
+```bash
+curl -X POST http://127.0.0.1:8000/items/ \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Phone", "price": 499.99}'
+```
+
+### List items (pagination, filtering, sorting)
+
+```bash
+curl -G http://127.0.0.1:8000/items/ \
+  -H "Authorization: Bearer $TOKEN" \
+  --data-urlencode "skip=0" \
+  --data-urlencode "limit=20" \
+  --data-urlencode "name=phone" \
+  --data-urlencode "min_price=100" \
+  --data-urlencode "mine=true" \
+  --data-urlencode "sort_by=price" \
+  --data-urlencode "order=desc"
+```
+
+### Get, update, and delete an item
+
+```bash
+curl http://127.0.0.1:8000/items/1 \
+  -H "Authorization: Bearer $TOKEN"
+
+curl -X PUT http://127.0.0.1:8000/items/1 \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Phone Pro", "price": 799.99}'
+
+curl -X DELETE http://127.0.0.1:8000/items/1 \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Admin: list users and update a role
+
+```bash
+# Requires a token belonging to a user whose role is "admin"
+curl -G http://127.0.0.1:8000/users/ \
+  -H "Authorization: Bearer $TOKEN" \
+  --data-urlencode "limit=20" \
+  --data-urlencode "is_active=true"
+
+curl -X PATCH http://127.0.0.1:8000/users/2/role \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"role": "admin"}'
+```
+
 ## Author
 
 - **Hendi Santika** — hendisantika@yahoo.co.id — [github.com/hendisantika](https://github.com/hendisantika)
