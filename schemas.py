@@ -16,8 +16,8 @@ class ItemResponse(ItemBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    created_by: int
-    updated_by: int | None = None
+    created_by: str
+    updated_by: str | None = None
 
     class Config:
         from_attributes = True

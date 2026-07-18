@@ -22,7 +22,7 @@ def create_item(
     db_item = models.Item(
         name=item.name,
         price=item.price,
-        created_by=current_user.id,
+        created_by=current_user.username,
     )
     db.add(db_item)
     db.commit()
@@ -56,7 +56,7 @@ def update_item(
 
     item.name = updated_item.name
     item.price = updated_item.price
-    item.updated_by = current_user.id
+    item.updated_by = current_user.username
     db.commit()
     db.refresh(item)
     return item

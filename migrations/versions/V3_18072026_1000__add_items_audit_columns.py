@@ -38,31 +38,15 @@ def upgrade() -> None:
     )
     op.add_column(
         "items",
-        sa.Column("created_by", sa.Integer(), nullable=False),
+        sa.Column("created_by", sa.String(length=50), nullable=False),
     )
     op.add_column(
         "items",
-        sa.Column("updated_by", sa.Integer(), nullable=True),
-    )
-    op.create_foreign_key(
-        "fk_items_created_by_users",
-        "items",
-        "users",
-        ["created_by"],
-        ["id"],
-    )
-    op.create_foreign_key(
-        "fk_items_updated_by_users",
-        "items",
-        "users",
-        ["updated_by"],
-        ["id"],
+        sa.Column("updated_by", sa.String(length=50), nullable=True),
     )
 
 
 def downgrade() -> None:
-    op.drop_constraint("fk_items_updated_by_users", "items", type_="foreignkey")
-    op.drop_constraint("fk_items_created_by_users", "items", type_="foreignkey")
     op.drop_column("items", "updated_by")
     op.drop_column("items", "created_by")
     op.drop_column("items", "updated_at")
