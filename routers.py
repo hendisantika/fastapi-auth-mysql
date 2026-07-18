@@ -36,11 +36,14 @@ def create_item(
 @router.get("/", response_model=schemas.PaginatedItems)
 def get_items(
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(10, ge=1, le=100, description="Max records to return"),
     name: str | None = Query(None, description="Filter by name (partial match)"),
     min_price: float | None = Query(None, ge=0, description="Minimum price"),
     max_price: float | None = Query(None, ge=0, description="Maximum price"),
+    mine: bool = Query(False, description="Only items created by the current user"),
+    created_by: str | None = Query(None, description="Filter by creator username"),
     sort_by: str = Query("id", description="Field to sort by"),
     order: str = Query("asc", pattern="^(asc|desc)$", description="Sort direction"),
 ):
@@ -52,6 +55,10 @@ def get_items(
 
     query = db.query(models.Item)
 
+    if mine:
+        query = query.filter(models.Item.created_by == current_user.username)
+    elif created_by:
+        query = query.filter(models.Item.created_by == created_by)
     if name:
         query = query.filter(models.Item.name.ilike(f"%{name}%"))
     if min_price is not None:

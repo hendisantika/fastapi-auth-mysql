@@ -124,6 +124,8 @@ The API is available at `http://127.0.0.1:8000`.
 | `name`      | –       | Filter by name (partial, case-insensitive match)  |
 | `min_price` | –       | Minimum price                                     |
 | `max_price` | –       | Maximum price                                     |
+| `mine`      | `false` | Only items created by the current user            |
+| `created_by`| –       | Filter by creator username (ignored when `mine`)  |
 | `sort_by`   | `id`    | `id`, `name`, `price`, `created_at`, `updated_at` |
 | `order`     | `asc`   | `asc` or `desc`                                   |
 
