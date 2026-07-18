@@ -49,6 +49,7 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     id: int
     is_active: bool
+    role: str
     created_at: datetime
 
     class Config:
