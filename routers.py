@@ -14,8 +14,16 @@ router = APIRouter(
 
 
 @router.post("/", response_model=schemas.ItemResponse)
-def create_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
-    db_item = models.Item(name=item.name, price=item.price)
+def create_item(
+    item: schemas.ItemCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    db_item = models.Item(
+        name=item.name,
+        price=item.price,
+        created_by=current_user.id,
+    )
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -37,7 +45,10 @@ def get_item(item_id: int, db: Session = Depends(get_db)):
 
 @router.put("/{item_id}", response_model=schemas.ItemResponse)
 def update_item(
-    item_id: int, updated_item: schemas.ItemCreate, db: Session = Depends(get_db)
+    item_id: int,
+    updated_item: schemas.ItemCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
 ):
     item = db.query(models.Item).filter(models.Item.id == item_id).first()
     if item is None:
@@ -45,6 +56,7 @@ def update_item(
 
     item.name = updated_item.name
     item.price = updated_item.price
+    item.updated_by = current_user.id
     db.commit()
     db.refresh(item)
     return item
