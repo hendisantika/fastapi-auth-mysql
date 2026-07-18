@@ -23,6 +23,13 @@ class ItemResponse(ItemBase):
         from_attributes = True
 
 
+class PaginatedItems(BaseModel):
+    total: int
+    skip: int
+    limit: int
+    items: list[ItemResponse]
+
+
 class UserBase(BaseModel):
     username: str = Field(min_length=3, max_length=50)
     email: EmailStr

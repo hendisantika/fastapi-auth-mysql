@@ -106,12 +106,30 @@ The API is available at `http://127.0.0.1:8000`.
 | POST   | `/auth/login`      | Obtain a JWT token      |
 | GET    | `/auth/me`         | Current user (JWT auth) |
 | POST   | `/items/`          | Create an item 🔒       |
-| GET    | `/items/`          | List all items 🔒       |
+| GET    | `/items/`          | List items (paginated) 🔒 |
 | GET    | `/items/{item_id}` | Get an item by ID 🔒    |
 | PUT    | `/items/{item_id}` | Update an item 🔒       |
 | DELETE | `/items/{item_id}` | Delete an item 🔒       |
 
 > 🔒 Requires a valid JWT bearer token (see [Authentication](#authentication)).
+
+### Listing items
+
+`GET /items/` supports pagination, filtering, and sorting via query parameters:
+
+| Param       | Default | Description                                       |
+|-------------|---------|---------------------------------------------------|
+| `skip`      | `0`     | Number of records to skip (offset)                |
+| `limit`     | `10`    | Max records to return (1–100)                     |
+| `name`      | –       | Filter by name (partial, case-insensitive match)  |
+| `min_price` | –       | Minimum price                                     |
+| `max_price` | –       | Maximum price                                     |
+| `sort_by`   | `id`    | `id`, `name`, `price`, `created_at`, `updated_at` |
+| `order`     | `asc`   | `asc` or `desc`                                   |
+
+Example: `GET /items/?skip=0&limit=20&name=phone&min_price=100&sort_by=price&order=desc`
+
+The response is an envelope: `{ "total", "skip", "limit", "items": [...] }`.
 
 ## Authentication
 
