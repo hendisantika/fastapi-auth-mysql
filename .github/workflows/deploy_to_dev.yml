@@ -109,6 +109,7 @@ jobs:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+      TZ: Asia/Jakarta
 
     steps:
       - name: Deploy over SSH
@@ -118,7 +119,7 @@ jobs:
           port: ${{ secrets.SSH_PORT_DEV }}
           username: ${{ secrets.SSH_USERNAME_DEV }}
           key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
-          envs: IMAGE_NAME,CONTAINER_NAME,IMAGE_TAG,DATABASE_URL,SECRET_KEY,ALGORITHM,ACCESS_TOKEN_EXPIRE_MINUTES
+          envs: IMAGE_NAME,CONTAINER_NAME,IMAGE_TAG,DATABASE_URL,SECRET_KEY,ALGORITHM,ACCESS_TOKEN_EXPIRE_MINUTES,TZ
           script: |
             set -e
             docker pull "$IMAGE_NAME:$IMAGE_TAG"
@@ -127,6 +128,7 @@ jobs:
             docker run --rm \
               --add-host=host.docker.internal:host-gateway \
               -e DATABASE_URL="$DATABASE_URL" \
+              -e TZ="$TZ" \
               "$IMAGE_NAME:$IMAGE_TAG" \
               alembic upgrade head
 
@@ -140,6 +142,7 @@ jobs:
               -e SECRET_KEY="$SECRET_KEY" \
               -e ALGORITHM="$ALGORITHM" \
               -e ACCESS_TOKEN_EXPIRE_MINUTES="$ACCESS_TOKEN_EXPIRE_MINUTES" \
+              -e TZ="$TZ" \
               -p 8888:8000 \
               "$IMAGE_NAME:$IMAGE_TAG"
             docker image prune -f
