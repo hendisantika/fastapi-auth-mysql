@@ -151,24 +151,25 @@ Required repository secrets:
 
 ## Reverse Proxy (nginx + Cloudflare)
 
-The app is served at **https://fastapi.gtilabs.id** through Cloudflare. Cloudflare
-terminates public TLS and forwards to the origin nginx, which serves HTTPS and
-reverse-proxies to the container on `127.0.0.1:8888`.
+The app is served at **https://fastapi.gtilabs.id** through Cloudflare using
+**Flexible** SSL: Cloudflare terminates public HTTPS and forwards to the origin
+nginx over plain HTTP (port 80). nginx reverse-proxies to the container on
+`127.0.0.1:8888`. No origin certificate is required.
 
 - Config: [`nginx/fastapi.gtilabsid.conf`](nginx/fastapi.gtilabsid.conf)
 - Provisioning: run the **Nginx Deploy** workflow
-  (`gh workflow run nginx-deploy.yml`) — it uploads the config, generates an
-  origin certificate, installs, and reloads nginx on the dev server.
+  (`gh workflow run nginx-deploy.yml`) — it uploads the config, installs, and
+  reloads nginx on the dev server.
 
 ### Cloudflare setup (dashboard, one-time)
 
 1. **DNS** — add an `A` record: `fastapi` → `157.245.53.112`, **Proxied**
    (orange cloud).
-2. **SSL/TLS mode** — set to **Full**. The provisioning workflow installs a
-   self-signed origin certificate, which Cloudflare accepts in Full mode.
-3. *(Optional, recommended)* For **Full (strict)**, generate a Cloudflare
-   **Origin Certificate**, place it on the server at
-   `/etc/nginx/ssl/fastapi.gtilabs.id.pem` / `.key`, and reload nginx.
+2. **SSL/TLS mode** — set to **Flexible**.
+
+> Note: in Flexible mode the origin serves HTTP only; the nginx config
+> intentionally does **not** redirect to HTTPS (that would loop against
+> Cloudflare).
 
 ## API Documentation
 

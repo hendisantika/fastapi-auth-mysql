@@ -38,17 +38,7 @@ jobs:
               sudo apt-get install -y nginx
             fi
 
-            # Origin certificate for Cloudflare "Full" mode.
-            # Generates a self-signed cert once; replace with a Cloudflare
-            # Origin Certificate for "Full (strict)".
-            sudo mkdir -p /etc/nginx/ssl
-            if [ ! -f /etc/nginx/ssl/fastapi.gtilabs.id.pem ]; then
-              sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
-                -keyout /etc/nginx/ssl/fastapi.gtilabs.id.key \
-                -out /etc/nginx/ssl/fastapi.gtilabs.id.pem \
-                -subj "/CN=fastapi.gtilabs.id"
-            fi
-
+            # Cloudflare Flexible mode: origin serves plain HTTP, no cert needed.
             # Install the site config and reload
             sudo mv /tmp/nginx/fastapi.gtilabsid.conf /etc/nginx/conf.d/fastapi.gtilabsid.conf
             sudo nginx -t
