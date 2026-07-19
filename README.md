@@ -11,6 +11,7 @@ A simple FastAPI CRUD API backed by MySQL using SQLAlchemy.
 - Pydantic request/response schemas
 - Auto-generated Swagger docs at `/docs`
 - Distributed tracing and metrics via Elastic APM
+- Log shipping to Grafana Loki
 
 ## Tech Stack
 
@@ -19,6 +20,7 @@ A simple FastAPI CRUD API backed by MySQL using SQLAlchemy.
 - [PyMySQL](https://pymysql.readthedocs.io/)
 - [Uvicorn](https://www.uvicorn.org/)
 - [Elastic APM](https://www.elastic.co/observability/application-performance-monitoring)
+- [Grafana Loki](https://grafana.com/oss/loki/)
 
 ## Requirements
 
@@ -203,6 +205,41 @@ Grab the server URL and a secret token (or API key) from your Elastic Cloud
 deployment under **APM → Add data**. Once set, transactions appear in Kibana
 under **Observability → APM**. Without a valid token the server returns
 `403 anonymous access not permitted`.
+
+## Logs (Grafana Loki)
+
+The app can ship its logs to [Grafana Loki](https://grafana.com/oss/loki/) for
+viewing in Grafana, wired in via [`loki_logging.py`](loki_logging.py). A
+non-blocking background thread batches log records and pushes them to Loki's
+HTTP API, so a slow or unreachable Loki never blocks a request; failures are
+reported to stderr and never raise back into the app.
+
+Like APM, it is **opt-in**: nothing happens until `LOKI_URL` is set. Configure
+via env vars (see [`.env.example`](.env.example)):
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `LOKI_URL` | Loki push endpoint. **Empty = disabled.** | _(unset)_ |
+| `LOKI_LABELS` | Comma-separated base labels | `app=fastapi-auth-mysql,env=local` |
+| `LOKI_USERNAME` / `LOKI_PASSWORD` | Optional HTTP basic auth | _(unset)_ |
+| `LOKI_TENANT_ID` | Optional multi-tenant org id (`X-Scope-OrgID`) | _(unset)_ |
+| `LOKI_USER_AGENT` | Override the User-Agent sent to Loki | `fastapi-auth-loki/1.0` |
+
+Example:
+
+```bash
+LOKI_URL=https://loki.mnet.web.id/loki/api/v1/push
+LOKI_LABELS=app=fastapi-auth,env=dev
+```
+
+Each log line is pushed with the base labels plus `level` and `logger`, so in
+Grafana's **Explore** view you can filter with, e.g.,
+`{app="fastapi-auth", level="error"}`.
+
+> **Note:** the `loki.mnet.web.id` endpoint is fronted by Cloudflare, which
+> blocks the default `Python-urllib` user-agent with an HTTP 403 (error 1010).
+> The handler therefore sends a custom `User-Agent` by default; override it with
+> `LOKI_USER_AGENT` if needed. No basic auth is required for this endpoint.
 
 ## API Documentation
 

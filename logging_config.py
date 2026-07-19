@@ -29,6 +29,11 @@ def configure_logging() -> None:
         force=True,
     )
 
+    # Optionally ship logs to Grafana Loki (no-op unless LOKI_URL is set).
+    from loki_logging import init_loki_logging
+
+    init_loki_logging()
+
 
 def get_logger(name: str) -> logging.Logger:
     return logging.getLogger(name)
