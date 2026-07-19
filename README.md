@@ -236,6 +236,11 @@ Each log line is pushed with the base labels plus `level` and `logger`, so in
 Grafana's **Explore** view you can filter with, e.g.,
 `{app="fastapi-auth", level="error"}`.
 
+A starter Grafana dashboard (log volume, status codes, latency, top endpoints,
+live logs) is provided in [`grafana/`](grafana/) — import
+[`grafana/dashboards/fastapi-auth-loki.json`](grafana/dashboards/fastapi-auth-loki.json)
+and pick your Loki data source. See [`grafana/README.md`](grafana/README.md).
+
 > **Note:** the `loki.mnet.web.id` endpoint is fronted by Cloudflare, which
 > blocks the default `Python-urllib` user-agent with an HTTP 403 (error 1010).
 > The handler therefore sends a custom `User-Agent` by default; override it with
