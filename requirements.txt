@@ -8,5 +8,5 @@ bcrypt==4.2.1
 python-jose[cryptography]==3.5.0
 python-multipart==0.0.32
 email-validator==2.3.0
-elastic-apm==6.23.0
+elastic-apm==6.26.2
 psutil==7.0.0
