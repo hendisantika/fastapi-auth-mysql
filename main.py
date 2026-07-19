@@ -3,6 +3,7 @@ import time
 from fastapi import FastAPI, Request
 
 from actuator import router as actuator_router
+from apm import init_apm
 from auth import router as auth_router
 from logging_config import configure_logging, get_logger
 from routers import router as items_router
@@ -24,6 +25,9 @@ app = FastAPI(
         "url": "https://github.com/hendisantika",
     },
 )
+
+# Attach Elastic APM (no-op unless ELASTIC_APM_SERVER_URL is set).
+init_apm(app)
 
 
 @app.middleware("http")

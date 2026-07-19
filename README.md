@@ -10,6 +10,7 @@ A simple FastAPI CRUD API backed by MySQL using SQLAlchemy.
 - MySQL persistence via SQLAlchemy ORM
 - Pydantic request/response schemas
 - Auto-generated Swagger docs at `/docs`
+- Distributed tracing and metrics via Elastic APM
 
 ## Tech Stack
 
@@ -17,6 +18,7 @@ A simple FastAPI CRUD API backed by MySQL using SQLAlchemy.
 - [SQLAlchemy](https://www.sqlalchemy.org/)
 - [PyMySQL](https://pymysql.readthedocs.io/)
 - [Uvicorn](https://www.uvicorn.org/)
+- [Elastic APM](https://www.elastic.co/observability/application-performance-monitoring)
 
 ## Requirements
 
@@ -170,6 +172,37 @@ nginx over plain HTTP (port 80). nginx reverse-proxies to the container on
 > Note: in Flexible mode the origin serves HTTP only; the nginx config
 > intentionally does **not** redirect to HTTPS (that would loop against
 > Cloudflare).
+
+## Observability (Elastic APM)
+
+The app ships with the [Elastic APM Python agent](https://www.elastic.co/guide/en/apm/agent/python/current/index.html),
+wired in via [`apm.py`](apm.py) using the Starlette/FastAPI integration. It
+captures request transactions, spans, and errors, plus system/process metrics.
+
+The agent is **opt-in**: it stays disabled until `ELASTIC_APM_SERVER_URL` is
+set, so local development and tests run without it. Configure it via env vars
+(see [`.env.example`](.env.example)):
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `ELASTIC_APM_SERVER_URL` | Elastic Cloud APM endpoint. **Empty = agent disabled.** | _(unset)_ |
+| `ELASTIC_APM_SERVICE_NAME` | Service name shown in Kibana | `fastapi-auth-mysql` |
+| `ELASTIC_APM_ENVIRONMENT` | Deployment environment | `production` |
+| `ELASTIC_APM_SERVICE_VERSION` | Service version tag | `1.0.0` |
+| `ELASTIC_APM_SECRET_TOKEN` | Auth: secret token (use this **or** the API key) | _(unset)_ |
+| `ELASTIC_APM_API_KEY` | Auth: API key (alternative to the secret token) | _(unset)_ |
+
+Example:
+
+```bash
+ELASTIC_APM_SERVER_URL=https://<id>.apm.<region>.gcp.elastic-cloud.com:443
+ELASTIC_APM_SECRET_TOKEN=<your-secret-token>
+```
+
+Grab the server URL and a secret token (or API key) from your Elastic Cloud
+deployment under **APM → Add data**. Once set, transactions appear in Kibana
+under **Observability → APM**. Without a valid token the server returns
+`403 anonymous access not permitted`.
 
 ## API Documentation
 
